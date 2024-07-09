@@ -1,21 +1,18 @@
-import connect from '../db';
-import { Product } from '../models/Product';
-import { ObjectId } from 'mongodb';
+import ProductModel from '../models/product';
+import { Product } from '../models/product';
 
-export async function createProduct(data: Product) {
-  const db = await connect();
-  const result = await db.collection('products').insertOne(data);
-  // Use the insertedId to fetch the newly inserted document
-  const newProduct = await db.collection('products').findOne({ _id: result.insertedId });
-  return newProduct;
+export async function createProduct(product: Product): Promise<Product> {
+  const newProduct = new ProductModel(product);
+  await newProduct.save();
+  return newProduct.toObject();
 }
 
-export async function getAllProducts() {
-  const db = await connect();
-  return await db.collection('products').find().toArray();
+export async function getAllProducts(): Promise<Product[]> {
+  const products = await ProductModel.find().exec();
+  return products.map(product => product.toObject());
 }
 
-export async function getProductById(id: string) {
-  const db = await connect();
-  return await db.collection('products').findOne({ _id: new ObjectId(id) });
+export async function getProductById(id: string): Promise<Product | null> {
+  const product = await ProductModel.findById(id).exec();
+  return product ? product.toObject() : null;
 }

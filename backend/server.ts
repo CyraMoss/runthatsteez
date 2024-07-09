@@ -1,41 +1,80 @@
-import * as express from 'express';
+import express from 'express';
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import connectToDatabase from './db';
+import ProductModel from './models/product';  // Import ProductModel
 import { createProduct, getAllProducts, getProductById } from './services/productService';
 
 const app = express();
-app.use(express.json());
+const port = 3000;
+
+app.use(cors());
+app.use(bodyParser.json());
+
+connectToDatabase().then(() => {
+    console.log('Connected to MongoDB');
+}).catch(error => {
+    console.error('Failed to connect to MongoDB', error);
+});
+
+app.get('/', (req, res) => {
+    res.send('Hello World!');
+});
 
 app.post('/products', async (req, res) => {
+    try {
+        const product = await createProduct(req.body);
+        res.status(201).json(product);
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to create product', error });
+    }
+});
+
+app.put('/products/:id', async (req, res) => {
   try {
-    const product = await createProduct(req.body);
-    res.status(201).json(product);
+      const product = await ProductModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+      if (!product) {
+          return res.status(404).json({ message: 'Product not found' });
+      }
+      res.status(200).json(product);
   } catch (error) {
-    res.status(500).send(error.message);
+      res.status(500).json({ message: 'Failed to update product', error });
+  }
+});
+
+app.delete('/products/:id', async (req, res) => {
+  try {
+      const product = await ProductModel.findByIdAndDelete(req.params.id);
+      if (!product) {
+          return res.status(404).json({ message: 'Product not found' });
+      }
+      res.status(200).json({ message: 'Product deleted successfully' });
+  } catch (error) {
+      res.status(500).json({ message: 'Failed to delete product', error });
   }
 });
 
 app.get('/products', async (req, res) => {
-  try {
-    const products = await getAllProducts();
-    res.json(products);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
+    try {
+        const products = await getAllProducts();
+        res.status(200).json(products);
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to get products', error });
+    }
 });
 
 app.get('/products/:id', async (req, res) => {
-  try {
-    const product = await getProductById(req.params.id);
-    if (product) {
-      res.json(product);
-    } else {
-      res.status(404).send('Product not found');
+    try {
+        const product = await getProductById(req.params.id);
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+        res.status(200).json(product);
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to get product', error });
     }
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
 });
 
-const port = process.env.PORT || 3000;
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+    console.log(`Server is running on port ${port}`);
 });
