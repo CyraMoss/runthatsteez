@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
-const url = process.env.MONGODB_URI || 'mongodb+srv://cyramoss:dKcZNdWnMr60Dk0i@cluster0.w4touyd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+dotenv.config();
+
+const url = process.env.MONGODB_URI || 'mongodb+srv://cyramoss:dKcZNdWnMr60Dk0i@cluster0.w4touyd.mongodb.net/runthatsteez?retryWrites=true&w=majority&appName=Cluster0';
 
 // Connect to MongoDB
 async function connectToDatabase() {
