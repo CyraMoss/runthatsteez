@@ -1,9 +1,10 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "dist/server.js",
   "scripts": {
-    "start": "tsc && node dist/server.js",
+    "build": "tsc",
+    "start": "node dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only server.ts"
   },
   "dependencies": {
@@ -17,6 +18,7 @@
     "express": "^4.19.2",
     "mongodb": "4.1",
     "mongoose": "^8.5.0",
+    "websocket": "^1.0.35",
     "ws": "^8.18.0"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
 // services/userService.ts
-import UserModel, { User } from '../models/user';
-import wss from '../websocket';
+import UserModel, { User } from '../models/User';
+import wss from '../../websocket';
 
 export async function getAllUsers(): Promise<User[]> {
   const users = await UserModel.find().exec();
@@ -35,7 +35,7 @@ export const deleteUser = async (userId: string): Promise<boolean> => {
 };
 
 const notifyClients = (message: any) => {
-  wss.clients.forEach((client) => {
+  wss.clients.forEach((client: any) => {
     if (client.readyState === client.OPEN) {
       client.send(JSON.stringify(message));
     }

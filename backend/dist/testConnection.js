@@ -6,17 +6,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-const url = process.env.MONGODB_URI || 'mongodb+srv://cyramoss:dKcZNdWnMr60Dk0i@cluster0.w4touyd.mongodb.net/runthatsteez?retryWrites=true&w=majority&appName=Cluster0';
-// Connect to MongoDB
-async function connectToDatabase() {
+const url = process.env.MONGODB_URI || 'your_backup_connection_string_here';
+async function testConnection() {
     try {
         await mongoose_1.default.connect(url);
         console.log('Connected to MongoDB');
-        return mongoose_1.default.connection;
+        mongoose_1.default.connection.close();
     }
     catch (error) {
         console.error('Failed to connect to MongoDB', error);
-        throw error;
     }
 }
-exports.default = connectToDatabase;
+testConnection();

@@ -3,7 +3,7 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import http from 'http';
 import { WebSocketServer } from 'ws';
-import connectToDatabase from './db';
+import connectToDatabase from '../db';
 import routes from './routes';
 
 const app = express();

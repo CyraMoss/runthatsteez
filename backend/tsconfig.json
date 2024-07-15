@@ -8,6 +8,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["*.ts", "services/userService.ts"],
+  "include": ["*.ts", "services/**.ts", "src/server.ts", "src/**/**.ts"],
   "exclude": ["node_modules", "dist"]
 }
