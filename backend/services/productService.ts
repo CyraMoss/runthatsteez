@@ -1,4 +1,4 @@
-import ProductModel, { Product } from '../models/product';
+import ProductModel, { Product } from '../models/Product';
 
 export async function createProduct(product: Product): Promise<Product> {
     const newProduct = new ProductModel(product);

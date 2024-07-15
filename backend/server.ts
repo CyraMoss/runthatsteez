@@ -1,80 +1,56 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import http from 'http';
+import { WebSocketServer } from 'ws';
 import connectToDatabase from './db';
-import ProductModel from './models/product';
-import { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct } from './services/productService';
+import routes from './routes';
 
 const app = express();
 const port = 3000;
 
+// Create HTTP server
+const server = http.createServer(app);
+
+// Create WebSocket server
+const wsServer = new WebSocketServer({ server });
+
 app.use(cors());
 app.use(bodyParser.json());
 
-connectToDatabase().then(() => {
-    console.log('Connected to MongoDB');
-}).catch(error => {
-    console.error('Failed to connect to MongoDB', error);
+wsServer.on('connection', (ws) => {
+  console.log('Client connected');
+
+  // Send updates to clients every 5 seconds
+  const interval = setInterval(() => {
+    ws.send(JSON.stringify({ message: 'Update from server' }));
+  }, 5000);
+
+  ws.on('close', () => {
+    console.log('Client disconnected');
+    clearInterval(interval); // Clear interval when client disconnects
+  });
 });
+
+wsServer.on('error', (error) => {
+  console.error('WebSocket error:', error);
+});
+
+connectToDatabase()
+  .then(() => {
+    console.log('Connected to MongoDB');
+  })
+  .catch((error) => {
+    console.error('Failed to connect to MongoDB', error);
+  });
 
 app.get('/', (req, res) => {
-    res.send('Hello World!');
+  res.send('this is the backend server getting all ya info from the database');
 });
 
-app.post('/products', async (req, res) => {
-    try {
-        const product = await createProduct(req.body);
-        res.status(201).json(product);
-    } catch (error) {
-        res.status(500).json({ message: 'Failed to create product', error });
-    }
-});
+app.use('/', routes);
 
-app.put('/products/:id', async (req, res) => {
-    try {
-        const product = await updateProduct(req.params.id, req.body);
-        if (!product) {
-            return res.status(404).json({ message: 'Product not found' });
-        }
-        res.status(200).json(product);
-    } catch (error) {
-        res.status(500).json({ message: 'Failed to update product', error });
-    }
-});
-
-app.delete('/products/:id', async (req, res) => {
-    try {
-        const product = await deleteProduct(req.params.id);
-        if (!product) {
-            return res.status(404).json({ message: 'Product not found' });
-        }
-        res.status(200).json({ message: 'Product deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ message: 'Failed to delete product', error });
-    }
-});
-
-app.get('/products', async (req, res) => {
-    try {
-        const products = await getAllProducts();
-        res.status(200).json(products);
-    } catch (error) {
-        res.status(500).json({ message: 'Failed to get products', error });
-    }
-});
-
-app.get('/products/:id', async (req, res) => {
-    try {
-        const product = await getProductById(req.params.id);
-        if (!product) {
-            return res.status(404).json({ message: 'Product not found' });
-        }
-        res.status(200).json(product);
-    } catch (error) {
-        res.status(500).json({ message: 'Failed to get product', error });
-    }
-});
-
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+// Start the server
+server.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
