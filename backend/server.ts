@@ -7,7 +7,7 @@ import connectToDatabase from './db';
 import routes from './routes';
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 5000;
 
 // Create HTTP server
 const server = http.createServer(app);
