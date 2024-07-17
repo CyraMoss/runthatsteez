@@ -7,7 +7,7 @@ import connectToDatabase from '../db';
 import routes from './routes';
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5001;
 
 // Create HTTP server
 const server = http.createServer(app);
@@ -15,7 +15,11 @@ const server = http.createServer(app);
 // Create WebSocket server
 const wsServer = new WebSocketServer({ server });
 
-app.use(cors());
+app.use(cors({
+  origin: ['https://runthatsteezfrontend.vercel.app'], // Add your frontend URL here
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+}));
 app.use(bodyParser.json());
 
 wsServer.on('connection', (ws) => {
